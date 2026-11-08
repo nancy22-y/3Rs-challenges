@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>3R 分类工坊</title>
+<style>
+:root{--bg:#e9f1dc;--bg2:#d4e4c0;--ink:#1f3a2a;--card:#fffaf0;--mute:#4d6a56;--rd:#e0679e;--ru:#e8b84a;--rc:#4fb587;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#2c4636;--bg2:#223a2b;--ink:#f7ecc0;--card:#3b5a47;--mute:#b9cdb0}}
+:root[data-theme="dark"]{--bg:#2c4636;--bg2:#223a2b;--ink:#f7ecc0;--card:#3b5a47;--mute:#b9cdb0}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 20% 0,var(--bg),var(--bg2));color:var(--ink);font-family:"PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;overflow-x:hidden;user-select:none;-webkit-user-select:none}
+.leaf{position:fixed;font-size:28px;opacity:.22;animation:fall linear infinite;pointer-events:none}
+@keyframes fall{from{transform:translateY(-10vh) rotate(0)}to{transform:translateY(110vh) rotate(360deg)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+main{max-width:760px;margin:0 auto;padding:12px 14px 20px;position:relative}
+.top{display:flex;align-items:center;gap:12px}
+.logo{font-size:44px;animation:spin 8s linear infinite}
+h1{font-size:clamp(26px,6vw,36px);margin:0;letter-spacing:2px}
+.sub{color:var(--mute);margin:2px 0 0}
+.screen{display:none}.screen.on{display:block}
+.orb{position:relative;width:230px;height:230px;margin:34px auto 22px}
+.orb .c{position:absolute;inset:55px;display:grid;place-items:center;font-size:64px;background:var(--card);border:3px solid var(--ink);border-radius:50%;box-shadow:0 5px 0 var(--ink)}
+.orb .r{position:absolute;inset:0;animation:spin 14s linear infinite}
+.orb .r span{position:absolute;width:62px;height:62px;border-radius:50%;border:3px solid var(--ink);display:grid;place-items:center;font-size:30px;background:var(--c);animation:spin 14s linear infinite reverse}
+.orb .r span:nth-child(1){left:84px;top:-16px}.orb .r span:nth-child(2){left:170px;top:134px}.orb .r span:nth-child(3){left:-2px;top:134px}
+.path{display:flex;align-items:center;justify-content:center;gap:6px;margin:6px 0 18px}
+.path b{width:46px;height:46px;border-radius:50%;border:3px solid var(--ink);display:grid;place-items:center;font-size:22px;background:var(--card)}
+.path i{width:22px;height:5px;background:var(--ink);border-radius:3px}
+.center{text-align:center}
+.hud{display:flex;align-items:center;gap:8px;margin:6px 0 10px}
+.pips{display:flex;gap:4px}.pips span{width:26px;height:26px;border-radius:50%;border:3px solid var(--ink);background:var(--card);font-size:13px;display:grid;place-items:center;font-weight:800}
+.pips .on{background:var(--c);transform:scale(1.15)}
+.bar{flex:1;height:14px;background:var(--bg2);border-radius:9px;overflow:hidden;border:2px solid var(--ink)}
+.bar i{display:block;height:100%;width:0;background:var(--rc);transition:width .4s}
+.pill{background:var(--card);border:2px solid var(--ink);border-radius:20px;padding:2px 10px;font-weight:700;white-space:nowrap}
+.belt{position:relative;height:250px;border-radius:22px;background:repeating-linear-gradient(90deg,var(--bg2) 0 24px,var(--bg) 24px 48px);background-size:48px 100%;border:3px solid var(--ink);display:flex;align-items:center;justify-content:center;overflow:hidden;animation:beltm 1s linear infinite}
+.belt::before,.belt::after{content:"♻️";position:absolute;font-size:30px;top:6px;animation:spin 6s linear infinite}
+.belt::before{left:8px}.belt::after{right:8px;animation-direction:reverse}
+@keyframes beltm{to{background-position:48px 0}}
+#card{position:relative;width:min(80%,400px);background:var(--card);border:3px solid var(--ink);border-radius:20px;padding:16px;text-align:center;cursor:grab;touch-action:none;box-shadow:0 6px 0 var(--ink);z-index:5;animation:enter .5s cubic-bezier(.2,1.4,.4,1)}
+#card.drag{cursor:grabbing;box-shadow:0 14px 0 rgba(0,0,0,.25);transition:none;z-index:50;animation:none}
+#card.go{transition:transform .5s ease-in,opacity .5s;opacity:0}
+#card.back{transition:transform .35s cubic-bezier(.2,1.5,.4,1)}
+@keyframes enter{from{transform:translateX(-120%) rotate(-12deg)}}
+.em{font-size:62px;line-height:1.1;animation:bob 2s ease-in-out infinite}
+#card.drag .em{animation:none}
+@keyframes bob{50%{transform:translateY(-6px) rotate(4deg)}}
+.tx{font-size:clamp(18px,4.6vw,23px);font-weight:700;line-height:1.5;margin-top:6px}
+.shake{animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-12px)}75%{transform:translateX(12px)}}
+.hint{text-align:center;color:var(--mute);margin:10px 0;line-height:1.6}
+.bins{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.bin{border:3px solid var(--ink);border-radius:18px;padding:10px 4px 12px;text-align:center;cursor:pointer;background:var(--c);color:#1f3a2a;transition:transform .2s;box-shadow:0 5px 0 var(--ink)}
+.bin.hot{transform:scale(1.07) translateY(-6px)}
+.pulse{animation:pulse .5s}
+@keyframes pulse{40%{transform:scale(1.15) rotate(-3deg)}}
+.bin .ic{font-size:34px}.bin b{display:block;font-size:clamp(15px,4vw,20px)}.bin small{font-size:12px;display:block}
+.fb{margin-top:14px;border-radius:18px;padding:12px 14px;border:3px solid var(--ink);background:var(--card);display:none}
+.fb.on{display:block;animation:up .3s}
+.fb.ok{border-color:var(--rc)}.fb.no{border-color:var(--rd)}
+@keyframes up{from{transform:translateY(14px);opacity:0}}
+.fb h3{margin:0 0 4px;font-size:20px}.fb p{margin:0 0 10px;line-height:1.6}
+.go2{font:inherit;font-weight:800;font-size:18px;background:var(--rd);color:#fff;border:3px solid var(--ink);border-radius:30px;padding:10px 30px;cursor:pointer;box-shadow:0 5px 0 var(--ink)}
+.go2:active{transform:translateY(4px);box-shadow:0 1px 0 var(--ink)}
+button:focus-visible,.bin:focus-visible{outline:4px solid var(--ru);outline-offset:3px}
+.big{font-size:76px;text-align:center;animation:bob 2s ease-in-out infinite}
+.rule{background:var(--card);border:3px solid var(--ink);border-radius:18px;padding:12px 16px;line-height:1.7;text-align:center;margin:10px 0 18px}
+.rev{background:var(--card);border:3px solid var(--ink);border-radius:16px;padding:8px 12px;margin:8px 0;line-height:1.5}
+.cf{position:fixed;font-size:26px;pointer-events:none;z-index:99;animation:cf .9s ease-out forwards}
+@keyframes cf{to{transform:translate(var(--x),var(--y)) rotate(360deg);opacity:0}}
+.sw{display:flex;gap:10px;margin-top:12px}.sw button{flex:1}
+.lab{position:absolute;top:50%;font-weight:800;font-size:18px;padding:6px 10px;border-radius:14px;border:3px solid var(--ink);opacity:0;z-index:1}
+.tgt{text-align:center;font-size:19px;font-weight:700;padding:8px;border:3px solid var(--c);background:var(--card);border-radius:16px;margin-bottom:8px}
+.bub{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:12px;min-height:260px;padding:8px}
+.b{width:30%;min-width:98px;max-width:150px;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 30% 25%,#fff9,var(--card) 62%);border:3px solid var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:14px;font-weight:700;padding:8px;cursor:pointer;line-height:1.3;animation:fl var(--d) ease-in-out infinite alternate}
+.b span{font-size:32px}
+@keyframes fl{to{transform:translateY(-12px) translateX(6px)}}
+.b.pop{animation:pop .35s forwards;pointer-events:none}
+@keyframes pop{to{transform:scale(1.5);opacity:0}}
+.b.lit{box-shadow:0 0 0 5px var(--c),0 0 22px var(--c)}
+.slots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.slot{min-height:130px;border:3px dashed var(--c);border-radius:16px;padding:6px;background:var(--card);font-size:13px}
+.slot>b{display:block;text-align:center;margin-bottom:6px;font-size:14px}
+.sc{background:var(--card);border:3px solid var(--ink);border-radius:14px;padding:10px 12px;margin:8px 0;font-weight:700;line-height:1.5;cursor:pointer;box-shadow:0 4px 0 var(--ink)}
+.sc.placed{box-shadow:none;cursor:default;font-size:13px;animation:pulse .4s;background:var(--c)}
+.foot{display:flex;gap:8px;justify-content:center;margin-top:22px;flex-wrap:wrap}
+.foot span{background:var(--c);color:#1f3a2a;border:3px solid var(--ink);border-radius:20px;padding:3px 12px;font-weight:800;font-size:14px}
+.foot span::before{content:"♻️ ";display:inline-block;animation:spin 5s linear infinite}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<main>
+<div class="top"><div class="logo">♻️</div><div><h1>3R 分类工坊</h1><p class="sub">少买少用，物尽其用，分类回收</p></div></div>
+
+<section id="s0" class="screen on">
+<div class="orb"><div class="r"><span style="--c:var(--rd)">🚫</span><span style="--c:var(--ru)">🔄</span><span style="--c:var(--rc)">♻️</span></div><div class="c">🌍</div></div>
+<div class="path"><b>🧲</b><i></i><b>🫧</b><i></i><b>♻️</b><i></i><b>🧭</b></div>
+<p class="hint">4 个关卡 · 拖一拖、点一点、滑一滑、排一排<br>看看你是不是 3R 小达人！</p>
+<div class="center"><button class="go2" id="start">开始挑战 🌱</button></div>
+</section>
+
+<section id="s1" class="screen">
+<div class="big" id="ii"></div>
+<h2 class="center" id="in"></h2>
+<div class="rule" id="id"></div>
+<div class="center"><button class="go2" id="ig">出发！</button></div>
+</section>
+
+<section id="sg" class="screen">
+<div class="hud"><div class="pips" id="pips"></div><div class="bar"><i id="pb"></i></div><span class="pill" id="sc"></span><span class="pill" id="cb"></span></div>
+<div id="body"></div>
+<div class="fb" id="fb" aria-live="polite"><h3 id="fh"></h3><p id="fp"></p><button class="go2" id="nx"></button></div>
+</section>
+
+<section id="s2" class="screen">
+<div class="big" id="bt"></div>
+<h2 id="rt" class="center"></h2>
+<p class="hint" id="rs"></p>
+<div id="rv"></div>
+<div class="center" style="margin-top:12px"><button class="go2" id="again">再玩一次</button></div>
+</section>
+
+<div class="foot"><span style="--c:var(--rd)">R1 Reduce</span><span style="--c:var(--ru)">R2 Reuse</span><span style="--c:var(--rc)">R3 Recycle</span></div>
+</main>
+<script>
+var R={reduce:"🚫 Reduce 减少使用",reuse:"🔄 Reuse 重复使用",recycle:"♻️ Recycle 回收"},CV={reduce:"--rd",reuse:"--ru",recycle:"--rc"};
+var BANK=[
+["🧋","自带杯去奶茶店买奶茶，不用一次性杯","reduce","自带杯，从源头减少一次性杯子的产生，属于“减少使用”。","自带奶茶杯"],
+["🔋","把废旧电池送到专门的回收点","recycle","电池要送到专门回收点做特殊处理，属于“回收”。","电池送回收点"],
+["🛍️","使用循环外卖袋和可重复填充容器","reuse","同一个袋子、容器反复用，属于“重复使用”。","循环外卖袋"],
+["🙅","婉拒不需要的塑料袋","reduce","购物前就说不，少产生垃圾，属于“减少使用”。","婉拒塑料袋"],
+["🍾","把洗干净的废塑料瓶剪开，变成笔筒或花盆","reuse","给旧物新用途，延长寿命，属于“重复使用”。","瓶子做花盆"],
+["📦","把快递硬纸箱拆开重组成桌面收纳盒","reuse","纸箱变身收纳盒，再次利用，属于“重复使用”。","纸箱做收纳盒"],
+["👕","把旧衣服改造成包包","reuse","旧衣服换个用途继续用，属于“重复使用”。","旧衣改包包"],
+["💧","倒空饮料、简单洗净的水瓶，放进塑料回收箱","recycle","丢弃前分类好，交给回收，属于“回收”。","空水瓶进回收箱"],
+["📄","干净的纸单，单独放进纸类回收","recycle","干净的纸可以回收变成新纸。","干净纸单回收"],
+["🥚","废纸鸡蛋托打成纸浆，做成新的鸡蛋托","recycle","废料变成新产品，属于“回收”。","纸蛋托变纸浆"],
+["🥤","买饮料选大瓶装，少买小包装","reduce","少买小包装，减少浪费，属于“减少使用”。","买大瓶装"],
+["🤔","先问自己：我真的需要吗？不需要就不买","reduce","3R 的第一步就是从“需要吗？”开始。","先问需要吗"],
+["🚰","出门自带水杯和环保袋","reduce","自带用品，拒绝一次性塑料。","自带水杯"],
+["🍱","饭盒洗干净，明天继续用","reuse","水瓶、饭盒、纸袋都能反复使用。","饭盒洗净再用"],
+["🛒","去超市自带环保购物袋","reduce","自带袋子，就不用拿一次性塑料袋。","带购物袋"],
+["🧦","破洞的袜子缝一缝继续穿","reuse","修补一下，延长物品寿命。","补袜子再穿"],
+["🫙","把洗净的玻璃罐拿来装零食","reuse","空罐子换个用途继续用。","玻璃罐装零食"],
+["🥫","喝完的易拉罐放进金属回收箱","recycle","金属可以回收再造新产品。","易拉罐回收"],
+["📰","看完的旧报纸放进纸类回收","recycle","干净的纸张可以回收成新纸。","报纸回收"],
+["🧸","不玩的玩具送给弟弟妹妹","reuse","让物品被继续使用，延长寿命。","玩具送人"],
+["🍴","吃饭自带餐具，不用一次性筷子","reduce","从源头减少一次性用品。","自带餐具"],
+["🖨️","作业草稿双面打印","reduce","少用纸，从源头减少资源消耗。","双面打印"],
+["📚","看完的旧书送给班级图书角","reuse","旧书让更多人继续阅读，属于“重复使用”。","旧书送图书角"],
+["🎁","礼物不要多余的包装和赠品","reduce","不需要的东西不拿，就不会变成垃圾。","拒绝多余赠品"]];
+var SW=[
+["🥤","洗净的塑料水瓶",true,"倒空、洗净的塑料瓶可以放进塑料回收箱。"],
+["🧻","用过的卫生纸",false,"弄脏的纸不可回收。"],
+["🍕","沾满油的披萨盒",false,"油腻的纸不可回收。"],
+["📄","干净的纸单",true,"干净的纸可以回收。"],
+["🥫","空易拉罐",true,"金属可以回收再造。"],
+["🥚","废纸鸡蛋托",true,"能打成纸浆做新产品。"],
+["🍌","吃剩的香蕉皮",false,"香蕉皮是厨余，不属于可回收物。"],
+["🔋","废旧电池",true,"可以回收，但要送到专门的回收点，不能随手丢。"],
+["📦","干净的纸箱",true,"干净纸箱压平后可以回收。"],
+["🧋","没倒空的奶茶杯",false,"还有饮料和污渍，要先倒空洗净才好回收。"],
+["🍬","黏糊糊的糖果纸",false,"弄脏、黏糊的包装不好回收。"],
+["📰","干净的旧报纸",true,"干净的纸张可以回收。"]];
+var SQ=[
+{t:"🧃 一瓶果汁的旅程",c:[["🤔 买之前想想：我真的需要吗？",0],["🌱 喝完把瓶子洗净剪开，当花盆",1],["♻️ 花盆破了，洗净放进塑料回收箱",2]],w:"从“需要吗”开始，到延长寿命，最后回收。"},
+{t:"📦 一个快递的旅程",c:[["🙅 只买需要的，拒绝多余包装",0],["🗃️ 纸箱拆开，做成桌面收纳盒",1],["♻️ 收纳盒旧了，压平放进纸类回收",2]],w:"少产生、多利用、再回收。"},
+{t:"👕 一件衣服的旅程",c:[["🛍️ 只买真正需要的衣服",0],["👜 穿小了，改成环保袋或送给别人",1],["♻️ 破得不能用了，交给旧衣回收箱",2]],w:"3R 是一个完整的循环。"}];
+var $=function(i){return document.getElementById(i)},sh=function(a){return a.slice().sort(function(){return Math.random()-.5})};
+var S,busy,TL=["购物前 · Reduce","使用中 · Reuse","丢弃前 · Recycle"];
+var LV=[
+{n:"分类拖拽",ic:"🧲",d:"物品和动作一个个送来。把它们拖进正确的 R 回收箱，也可以直接点回收箱。",f:sortLv},
+{n:"泡泡捕捉",ic:"🫧",d:"泡泡在飘！慢慢找，只点破属于目标 R 的泡泡。点错会扣分哦。",f:bubLv},
+{n:"能回收吗？",ic:"♻️",d:"向右滑 = 能回收，向左滑 = 不能回收。注意：脏的、油腻的纸不能回收！",f:swipeLv},
+{n:"3R 旅程",ic:"🧭",d:"一件物品的旅程：购物前、使用中、丢弃前。点击卡片，按顺序放进格子。",f:seqLv}];
+function scr(n){["s0","s1","sg","s2"].forEach(function(s,k){$(s).classList.toggle("on",k==n)})}
+function hud(p){$("sc").textContent="⭐ "+S.score;$("cb").textContent="🔥 "+S.combo;$("pb").style.width=(p*100)+"%";
+var cs=["--rd","--ru","--rc","--rd"];$("pips").innerHTML=LV.map(function(l,k){return '<span class="'+(k==S.lv?"on":"")+'" style="--c:var('+cs[k]+')">'+(k+1)+"</span>"}).join("")}
+function fb(ok,h,p,btn,cb){$("fh").textContent=h;$("fp").textContent=p;$("nx").textContent=btn;$("fb").className="fb on "+(ok?"ok":"no");$("nx").onclick=function(){$("fb").className="fb";cb()}}
+function pts(ok,it){if(ok){S.combo++;S.score+=10+Math.min(S.combo-1,5)*2}else{S.combo=0;S.wrong.push(it)}hud(0)}
+function conf(x,y){var e=["♻️","🍃","⭐","🌱"];for(var k=0;k<14;k++){var s=document.createElement("span");s.className="cf";s.textContent=e[k%4];s.style.left=x+"px";s.style.top=y+"px";var a=Math.random()*6.28,d=60+Math.random()*90;s.style.setProperty("--x",Math.cos(a)*d+"px");s.style.setProperty("--y",Math.sin(a)*d-40+"px");document.body.appendChild(s);setTimeout(function(n){n.remove()},1000,s)}}
+function pulse(el,c){el.classList.remove(c);void el.offsetWidth;el.classList.add(c)}
+function hot(h){document.querySelectorAll(".bin").forEach(function(b){b.classList.toggle("hot",b===h)})}
+function binAt(x,y){var el=document.elementsFromPoint(x,y);for(var k=0;k<el.length;k++){var b=el[k].closest&&el[k].closest(".bin");if(b)return b}return null}
+function dragify(c,mv,dr){var d=null;
+c.onpointerdown=function(e){if(busy)return;d={x:e.clientX,y:e.clientY};c.setPointerCapture(e.pointerId);c.className="drag"};
+c.onpointermove=function(e){if(!d)return;var dx=e.clientX-d.x,dy=e.clientY-d.y;c.style.transform="translate("+dx+"px,"+dy+"px) rotate("+dx/20+"deg)";mv(dx,dy,e)};
+c.onpointerup=c.onpointercancel=function(e){if(!d)return;var dx=e.clientX-d.x,dy=e.clientY-d.y;d=null;if(!dr(dx,dy,e)){c.className="back";c.style.transform=""}}}
+function reset(c){c.className="";c.style.transform="";c.style.animation="none";void c.offsetWidth;c.style.animation=""}
+function fly(c,dx,dy,s){c.className="go";c.style.transform="translate("+dx+"px,"+dy+"px) scale("+s+") rotate(200deg)"}
+
+function sortLv(done){var L=sh(BANK).slice(0,8),i=0;
+$("body").innerHTML='<div class="belt"><div id="card"><div class="em" id="em"></div><div class="tx" id="tx"></div></div></div><p class="hint" id="hint">拖动卡片到回收箱 👇</p><div class="bins">'+Object.keys(R).map(function(k){var p=R[k].split(" ");return '<div class="bin" data-k="'+k+'" style="--c:var('+CV[k]+')" tabindex="0" role="button"><div class="ic">'+p[0]+"</div><b>"+p[1]+"</b><small>"+p[2]+"</small></div>"}).join("")+"</div>";
+var c=$("card");
+function load(){busy=false;var it=L[i];$("em").textContent=it[0];$("tx").textContent=it[1];reset(c);hud(i/8);$("hint").style.visibility="visible"}
+function ans(k){if(busy)return;busy=true;var it=L[i],b=document.querySelector('.bin[data-k="'+k+'"]'),br=b.getBoundingClientRect(),ok=k==it[2];pts(ok,it);hot();$("hint").style.visibility="hidden";
+if(ok){var cr=c.getBoundingClientRect();fly(c,br.left+br.width/2-(cr.left+cr.width/2),br.top+br.height/2-(cr.top+cr.height/2),.1);pulse(b,"pulse");conf(br.left+br.width/2,br.top)}
+else{c.className="back";c.style.transform="";pulse(b,"shake");setTimeout(function(){c.className="shake"},360)}
+hud((i+1)/8);
+setTimeout(function(){fb(ok,ok?(S.combo>2?"🎉 连对 "+S.combo+" 个！":"✅ 答对了！"):"🤔 它属于 "+R[it[2]],it[3],i==7?"完成本关":"下一个",function(){i++;i>=8?done():load()})},ok?350:250)}
+document.querySelectorAll(".bin").forEach(function(b){b.onclick=function(){ans(b.dataset.k)};b.onkeydown=function(e){if(e.key=="Enter"||e.key==" "){e.preventDefault();ans(b.dataset.k)}}});
+dragify(c,function(dx,dy,e){hot(binAt(e.clientX,e.clientY))},function(dx,dy,e){var h=binAt(e.clientX,e.clientY);hot();if(h){ans(h.dataset.k);return true}return false});
+load()}
+
+function bubLv(done){var Rs=sh(Object.keys(R)).slice(0,2),r=0;
+function round(){var t=Rs[r],pool=sh(BANK),tg=pool.filter(function(x){return x[2]==t}).slice(0,4),ot=pool.filter(function(x){return x[2]!=t}).slice(0,5),left=tg.length,over=false;
+$("body").innerHTML='<div class="tgt" style="--c:var('+CV[t]+')">找出所有 <b>'+R[t]+"</b> 的泡泡！</div><div class=\"bub\" id=\"bub\"></div><p class=\"hint\" id=\"msg\">点破属于目标的泡泡，一共 "+left+" 个</p>";
+hud(r/2);
+sh(tg.concat(ot)).forEach(function(it){var d=document.createElement("div");d.className="b";d.style.setProperty("--d",(1.5+Math.random()*2)+"s");d.style.setProperty("--c","var("+CV[t]+")");d.innerHTML="<span>"+it[0]+"</span>"+it[4];d.dataset.t=it[2]==t?1:0;
+d.onclick=function(){if(over)return;var br=d.getBoundingClientRect();
+if(it[2]==t){d.classList.add("pop");conf(br.left+br.width/2,br.top+br.height/2);S.combo++;S.score+=10;left--;hud(r/2);$("msg").textContent="✅ "+it[3];if(!left)fin(true)}
+else{S.combo=0;S.score=Math.max(0,S.score-5);S.wrong.push(it);hud(r/2);pulse(d,"shake");$("msg").textContent="❌ 不对哦："+it[3]}};
+$("bub").appendChild(d)});
+
+function fin(win){if(over)return;over=true;document.querySelectorAll('.b[data-t="1"]:not(.pop)').forEach(function(b){b.classList.add("lit")});
+fb(true,"🫧 全部找到了！","太棒了，你找出了所有 "+R[t]+" 的泡泡！",r==1?"完成本关":"下一轮",function(){r++;r>=2?done():round()})}}
+round()}
+
+function swipeLv(done){var L=sh(SW).slice(0,8),i=0;
+$("body").innerHTML='<div class="belt"><div class="lab" id="lL" style="left:6px;background:var(--rd);color:#fff;margin-top:-20px">❌ 不能</div><div class="lab" id="lR" style="right:6px;background:var(--rc);color:#1f3a2a;margin-top:-20px">✅ 能回收</div><div id="card"><div class="em" id="em"></div><div class="tx" id="tx"></div></div></div><p class="hint">向右滑 = 能回收　向左滑 = 不能回收</p><div class="sw"><button class="go2" id="bn" style="background:var(--rd)">❌ 不能</button><button class="go2" id="by" style="background:var(--rc);color:#1f3a2a">✅ 能回收</button></div>';
+var c=$("card");
+function load(){busy=false;var it=L[i];$("em").textContent=it[0];$("tx").textContent=it[1];reset(c);hud(i/8);$("lL").style.opacity=$("lR").style.opacity=0}
+function ans(y){if(busy)return;busy=true;var it=L[i],ok=y==it[2];pts(ok,it);$("lL").style.opacity=$("lR").style.opacity=0;
+if(ok){fly(c,y?420:-420,-40,.6);var r=c.getBoundingClientRect();conf(r.left+r.width/2,r.top)}else{c.className="back";c.style.transform="";setTimeout(function(){c.className="shake"},360)}
+hud((i+1)/8);
+setTimeout(function(){fb(ok,ok?"✅ 判断正确！":"🤔 其实"+(it[2]?"可以回收":"不能回收"),it[3],i==7?"完成本关":"下一个",function(){i++;i>=8?done():load()})},ok?350:250)}
+$("bn").onclick=function(){ans(false)};$("by").onclick=function(){ans(true)};
+dragify(c,function(dx){$("lR").style.opacity=Math.max(0,Math.min(1,dx/90));$("lL").style.opacity=Math.max(0,Math.min(1,-dx/90))},function(dx){if(Math.abs(dx)>90){ans(dx>0);return true}$("lL").style.opacity=$("lR").style.opacity=0;return false});
+load()}
+
+function seqLv(done){var St=sh(SQ).slice(0,2),r=0;
+function round(){var s=St[r],n=0,cs=["--rd","--ru","--rc"];
+$("body").innerHTML='<div class="tgt" style="--c:var(--ru)">'+s.t+'</div><div class="slots" id="sl">'+TL.map(function(l,k){return '<div class="slot" style="--c:var('+cs[k]+')"><b>'+l+"</b></div>"}).join("")+'</div><p class="hint">按顺序，点击下面的卡片，放进格子 👇</p><div id="pool"></div>';
+hud(r/2);
+sh(s.c).forEach(function(it){var d=document.createElement("div");d.className="sc";d.textContent=it[0];
+d.onclick=function(){if(d.classList.contains("placed"))return;
+if(it[1]==n){var sl=$("sl").children[n];d.style.setProperty("--c","var("+cs[n]+")");d.classList.add("placed");sl.appendChild(d);S.score+=10;S.combo++;n++;hud(r/2);var b=sl.getBoundingClientRect();conf(b.left+b.width/2,b.top);
+if(n==3)setTimeout(function(){fb(true,"🌍 完整的 3R 旅程！",s.w,r==1?"完成本关":"下一个旅程",function(){r++;r>=2?done():round()})},400)}
+else{S.combo=0;hud(r/2);pulse(d,"shake");$("sl").children[n].style.borderStyle="solid";setTimeout(function(){$("sl").children[n].style.borderStyle="dashed"},500)}};
+$("pool").appendChild(d)})}
+round()}
+
+function intro(){if(S.lv>=LV.length)return end();var l=LV[S.lv];$("ii").textContent=l.ic;$("in").textContent="第 "+(S.lv+1)+" 关：" + l.n;$("id").textContent=l.d;scr(1)}
+function end(){scr(3);var st=S.score>=260?3:S.score>=180?2:S.score>=100?1:0;
+$("bt").textContent=["🌱","🌿","🌳","🌳✨"][st];
+$("rt").textContent=["继续加油，小小环保员！","不错哦，环保新星！","很棒！环保小卫士！","满分达人！3R 大师！"][st];
+$("rs").textContent="总得分 ⭐ "+S.score+"　"+"🌟".repeat(st)+"☆".repeat(3-st);
+var seen={},h="",n=0;S.wrong.forEach(function(w){if(seen[w[1]]||n>=6)return;seen[w[1]]=1;n++;h+='<div class="rev">'+w[0]+" "+w[1]+"<br>👉 "+(typeof w[2]=="string"?R[w[2]]:(w[2]?"✅ 能回收":"❌ 不能回收"))+"</div>"});
+$("rv").innerHTML=n?"<p><b>再复习一下这些：</b></p>"+h:"<p class=\"center\">一题都没错，太厉害了！🎉</p>";
+if(st>1)for(var k=0;k<4;k++)setTimeout(function(){conf(innerWidth/2,innerHeight/3)},k*250)}
+function start(){S={score:0,combo:0,lv:0,wrong:[]};intro()}
+$("start").onclick=start;$("again").onclick=start;
+$("ig").onclick=function(){scr(2);$("fb").className="fb";hud(0);LV[S.lv].f(function(){S.lv++;intro()})};
+for(var k=0;k<10;k++){var l=document.createElement("span");l.className="leaf";l.textContent=["🍃","🌿","♻️"][k%3];l.style.left=(k*10+Math.random()*8)+"%";l.style.animationDuration=(12+Math.random()*10)+"s";l.style.animationDelay=(-Math.random()*20)+"s";document.body.appendChild(l)}
+</script>
+</body>
+</html>
